@@ -45,7 +45,12 @@ func (g *Gomoku) createUI() {
 		}
 	}
 
-	g.window.SetContent(grid)
+	resetButton := widget.NewButton("Reset", func() {
+		g.resetGame()
+	})
+
+	content := container.NewVBox(grid, resetButton)
+	g.window.SetContent(content)
 }
 
 func (g *Gomoku) makeMove(x, y int) func() {
@@ -107,10 +112,25 @@ func (g *Gomoku) endGame(winner int) {
 	g.window.SetTitle(fmt.Sprintf("Player %d wins!", winner))
 }
 
+func (g *Gomoku) resetGame() {
+	g.board = make([][]int, boardSize)
+	for i := range g.board {
+		g.board[i] = make([]int, boardSize)
+	}
+	g.player = 1
+	for y := 0; y < boardSize; y++ {
+		for x := 0; x < boardSize; x++ {
+			g.buttons[y][x].SetText("")
+			g.buttons[y][x].Enable()
+		}
+	}
+	g.window.SetTitle("Gomoku")
+}
+
 func main() {
 	a := app.New()
 	w := a.NewWindow("Gomoku")
-	w.Resize(fyne.NewSize(400, 400))
+	w.Resize(fyne.NewSize(400, 430))
 
 	game := newGomoku()
 	game.window = w
